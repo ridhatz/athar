@@ -1,5 +1,11 @@
 import { Link, usePage } from '@inertiajs/react';
-import { LayoutGrid, ListChecks, PlusCircle } from 'lucide-react';
+import {
+    LayoutGrid,
+    ListChecks,
+    PlusCircle,
+    UserCog,
+    Users,
+} from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -14,6 +20,8 @@ import {
 } from '@/components/ui/sidebar';
 import { useT } from '@/hooks/use-t';
 import { dashboard } from '@/routes';
+import { index as people } from '@/routes/admin/users';
+import { index as workload } from '@/routes/workload';
 import { create, index } from '@/routes/requests';
 import type { NavItem } from '@/types';
 
@@ -24,6 +32,11 @@ export function AppSidebar() {
     const mainNavItems: NavItem[] = [
         { title: t('nav.dashboard'), href: dashboard(), icon: LayoutGrid },
         { title: t('nav.requests'), href: index(), icon: ListChecks },
+        { title: t('nav.workload'), href: workload(), icon: Users },
+        // Only administrators are offered the People screen (the server enforces it regardless).
+        ...(can.manage_users
+            ? [{ title: t('nav.people'), href: people(), icon: UserCog }]
+            : []),
         // Whether the person may file requests is decided by the server (management is observe-only).
         ...(can.create_request
             ? [

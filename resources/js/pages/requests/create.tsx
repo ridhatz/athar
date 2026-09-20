@@ -1,5 +1,5 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import { ArrowLeft, ChevronDown } from 'lucide-react';
+import { ArrowLeft, ChevronDown, X } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import {
@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
+import { formatSize } from '@/components/athar/files-card';
 import { useFormat } from '@/hooks/use-format';
 import { useT } from '@/hooks/use-t';
 import { index, store } from '@/routes/requests';
@@ -28,6 +29,7 @@ type Props = {
     priorities: string[];
     departments: { id: number; name: string }[];
     ownDepartment: string | null;
+    maxUploadMb: number;
 };
 
 /**
@@ -39,6 +41,7 @@ export default function CreateRequest({
     priorities,
     departments,
     ownDepartment,
+    maxUploadMb,
 }: Props) {
     const { t } = useT();
     const format = useFormat();
@@ -50,7 +53,13 @@ export default function CreateRequest({
         description: '',
         priority: 'NORMAL',
         department_id: '',
+        files: [] as File[],
     });
+
+    // Laravel reports per-file problems as files.0, files.1 ... and a general one as files.
+    const fileErrors = Object.entries(form.errors)
+        .filter(([key]) => key === 'files' || key.startsWith('files.'))
+        .map(([, message]) => String(message));
 
     // The server reports the deadline under its own name, while this form edits it as a plain day.
     const errors = form.errors as Record<string, string | undefined>;
@@ -72,9 +81,11 @@ export default function CreateRequest({
             department_id: data.department_id
                 ? Number(data.department_id)
                 : null,
+            files: data.files,
         }));
 
-        form.post(store().url);
+        // Files need a multipart body.
+        form.post(store().url, { forceFormData: true });
     };
 
     return (
@@ -208,6 +219,72 @@ export default function CreateRequest({
                             {t('form.field.description_hint')}
                         </p>
                         <InputError message={form.errors.description} />
+                    </div>
+
+                    {/* Attach a PDF brief (or any allowed file) right when opening the ticket. */}
+                    <div className="grid gap-2">
+                        <Label htmlFor="files">
+                            {t('form.files.title')}{' '}
+                            <span className="text-muted-foreground font-normal">
+                                ({t('common.optional')})
+                            </span>
+                        </Label>
+                        <input
+                            id="files"
+                            type="file"
+                            multiple
+                            accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.png,.jpg,.jpeg,.gif,.webp,.zip,.txt,.csv,.mp4,.mov,.mp3"
+                            onChange={(event) => {
+                                const picked = Array.from(
+                                    event.target.files ?? [],
+                                );
+                                form.setData(
+                                    'files',
+                                    [...form.data.files, ...picked].slice(0, 5),
+                                );
+                                event.target.value = '';
+                            }}
+                            className="file:bg-secondary file:text-secondary-foreground text-sm file:mr-3 file:rounded-md file:border-0 file:px-3 file:py-1.5 file:text-sm file:font-medium"
+                        />
+                        <p className="text-muted-foreground text-xs">
+                            {t('form.files.hint', { max: maxUploadMb })}
+                        </p>
+                        {form.data.files.length > 0 && (
+                            <ul className="space-y-1.5">
+                                {form.data.files.map((file, position) => (
+                                    <li
+                                        key={`${file.name}-${position}`}
+                                        className="bg-muted flex items-center justify-between gap-3 rounded-md px-3 py-1.5 text-sm"
+                                    >
+                                        <span className="truncate">
+                                            {file.name}
+                                        </span>
+                                        <span className="text-muted-foreground shrink-0 text-xs">
+                                            {formatSize(file.size)}
+                                        </span>
+                                        <button
+                                            type="button"
+                                            className="text-muted-foreground hover:text-destructive shrink-0"
+                                            aria-label={`${t('form.files.remove')} ${file.name}`}
+                                            onClick={() =>
+                                                form.setData(
+                                                    'files',
+                                                    form.data.files.filter(
+                                                        (_, i) =>
+                                                            i !== position,
+                                                    ),
+                                                )
+                                            }
+                                        >
+                                            <X className="size-4" />
+                                        </button>
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                        {fileErrors.map((message) => (
+                            <InputError key={message} message={message} />
+                        ))}
                     </div>
 
                     <Collapsible

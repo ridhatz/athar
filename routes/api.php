@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\V1\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\DiscussionController;
 use App\Http\Controllers\Api\V1\LookupController;
@@ -7,6 +8,7 @@ use App\Http\Controllers\Api\V1\RequestController;
 use App\Http\Controllers\AttachmentDownloadController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\WorkloadController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -32,6 +34,14 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
 
         Route::get('dashboards/{perspective}', [DashboardController::class, 'show'])->whereIn('perspective', ['requester', 'staff', 'management'])->name('dashboards.show');
 
+        Route::get('workload', [WorkloadController::class, 'api'])->name('workload');
+
+        Route::prefix('admin')->name('admin.')->group(function () {
+            Route::get('users', [AdminUserController::class, 'index'])->name('users.index');
+            Route::post('users', [AdminUserController::class, 'store'])->name('users.store');
+            Route::patch('users/{user}', [AdminUserController::class, 'update'])->name('users.update');
+            Route::post('users/{user}/reset-password', [AdminUserController::class, 'resetPassword'])->name('users.reset-password');
+        });
         Route::get('categories', [LookupController::class, 'categories'])->name('categories');
         Route::get('teams', [LookupController::class, 'teams'])->name('teams');
         Route::get('users', [LookupController::class, 'users'])->name('users');

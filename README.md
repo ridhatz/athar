@@ -117,7 +117,7 @@ Layar admin untuk kelola user/tim/kategori belum ada (lihat bagian bawah).
 ## Pengujian
 
 ```powershell
-php artisan test        # 334 test, memakai database athar_test (bukan database kerja)
+php artisan test        # 406 test, memakai database athar_test (bukan database kerja)
 npm run types:check     # TypeScript
 npm run check           # lint + format
 php vendor\bin\pint     # gaya kode PHP
@@ -186,6 +186,19 @@ reviewer **setujui atau minta revisi** → selesai. Requester melihat progres, d
 - Peran & visibilitas (404 untuk yang tidak boleh lihat), riwayat penugasan, audit trail tak bisa diubah,
   API `/api/v1`, UI dua bahasa (ID/EN).
 
+- **Pengguna (khusus ADMIN):** menu **Pengguna** untuk menambah orang dengan peran yang sesuai (Pemohon, Staf/PIC,
+  Ketua Tim, Admin, Manajemen), mengubah peran/tim/departemen, menonaktifkan-mengaktifkan akun, dan reset password.
+  Password dibuatkan otomatis dan **tampil sekali**; tidak pernah disimpan dalam bentuk terbaca. Aturan: Manajemen
+  tidak boleh digabung peran lain, Staf/Ketua Tim wajib punya tim, admin tidak bisa menonaktifkan dirinya, dan selalu
+  tersisa minimal satu admin aktif. Setiap perubahan tercatat di `audit_logs` (tak bisa diubah, tanpa password).
+- **Bar warna prioritas:** setiap tugas berbar hijau (Rendah), kuning (Normal), oranye (Tinggi), merah (Kritis) di daftar
+  dan halaman detail. Warna mengikuti prioritas yang **dipilih manusia** dan selalu disertai tulisan.
+- **Upload saat membuka tiket:** form buat request menerima sampai 5 berkas (PDF, dokumen, gambar, dst.) untuk semua
+  kategori. Semua diperiksa dulu; satu berkas ditolak = request tidak dibuat sama sekali (tanpa nomor terbuang).
+- **Beban kerja (menu "Beban kerja"):** semua orang bisa melihat siapa mengerjakan apa (hanya **kategori**, mis.
+  "Website, Desain", bukan isi request). Bar hijau/kuning/oranye/**merah untuk lebih dari 6 tugas**. Merah adalah
+  peringatan, bukan batas: tugas tetap bisa diminta dan diberikan. Batas warna: `ATHAR_WORKLOAD_*_FROM` di `.env`.
+
 ### Pengingat tenggat (scheduler)
 
 Pengingat "segera jatuh tempo" dan "terlambat" dikirim oleh `php artisan athar:notify-deadlines` (dijadwalkan
@@ -201,8 +214,7 @@ untuk mematikan email.
 
 ## Yang belum dikerjakan
 
-1. **Layar admin** untuk user, tim, kategori, departemen. Sementara ini lewat `athar:create-user` dan database
-   (dan `tinker` untuk menonaktifkan akun).
+1. **Layar admin untuk tim, kategori, dan departemen** (pengguna sudah ada). Sementara ini lewat database.
 2. **Terjemahan dua bahasa** untuk halaman **Pengaturan** dan lupa/reset password (masih teks bawaan starter kit).
 3. Belum ada: WhatsApp, AI agent, analitik lanjutan, aplikasi mobile (di luar V1 menurut spec).
 

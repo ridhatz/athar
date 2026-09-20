@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Http\Resources\NotificationResource;
 use App\Models\ServiceRequest;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Middleware;
@@ -51,6 +52,7 @@ class HandleInertiaRequests extends Middleware
             // What the signed-in person may do, decided by the policy. The UI only shows or hides.
             'can' => [
                 'create_request' => $user !== null && Gate::forUser($user)->allows('create', ServiceRequest::class),
+                'manage_users' => $user !== null && Gate::forUser($user)->allows('viewAny', User::class),
             ],
             // The bell: unread count and the latest few. Cheap enough to send with every page.
             'notifications' => $user ? [

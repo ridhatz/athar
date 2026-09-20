@@ -114,7 +114,13 @@ export type AssignmentEntry = {
 
 export type Assignables = {
     teams: NamedRef[];
-    users: { id: number; name: string; team_ids: number[] }[];
+    users: {
+        id: number;
+        name: string;
+        team_ids: number[];
+        open: number;
+        level: LoadLevel;
+    }[];
 };
 
 /** Laravel's paginated resource collection. */
@@ -230,4 +236,42 @@ export type DashboardData = {
     requester?: { cards: DashboardCard[] };
     staff?: { cards: DashboardCard[] };
     management?: ManagementDashboard;
+};
+
+export type LoadLevel = 'green' | 'yellow' | 'orange' | 'red';
+
+export type WorkloadEntry = {
+    rank: number;
+    id: number;
+    name: string;
+    teams: string[];
+    open: number;
+    level: LoadLevel;
+    working_on: { category: string; count: number }[];
+    completed_30d: number;
+};
+
+export type RoleCodeName =
+    | 'REQUESTER'
+    | 'STAFF'
+    | 'TEAM_LEAD'
+    | 'ADMIN'
+    | 'MANAGEMENT';
+
+export type AdminUser = {
+    id: number;
+    name: string;
+    email: string;
+    is_active: boolean;
+    locale: 'id' | 'en';
+    department: NamedRef | null;
+    roles: RoleCodeName[];
+    teams: NamedRef[];
+    created_at: string | null;
+};
+
+export type Credentials = {
+    name: string;
+    email: string;
+    password: string | null;
 };

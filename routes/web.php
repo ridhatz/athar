@@ -1,11 +1,13 @@
 <?php
 
+use App\Http\Controllers\Admin\UserPageController;
 use App\Http\Controllers\AttachmentDownloadController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\RequestDiscussionController;
 use App\Http\Controllers\RequestPageController;
+use App\Http\Controllers\WorkloadController;
 use Illuminate\Support\Facades\Route;
 
 // Language switch works before sign-in too (login screen).
@@ -19,6 +21,16 @@ Route::middleware(['auth', 'active'])->group(function () {
 
     Route::post('notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.read-all');
     Route::post('notifications/{id}/open', [NotificationController::class, 'open'])->name('notifications.open');
+
+    Route::get('workload', [WorkloadController::class, 'index'])->name('workload.index');
+
+    // People management (ADMIN only, enforced by UserPolicy inside the Actions).
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::get('users', [UserPageController::class, 'index'])->name('users.index');
+        Route::post('users', [UserPageController::class, 'store'])->name('users.store');
+        Route::patch('users/{user}', [UserPageController::class, 'update'])->name('users.update');
+        Route::post('users/{user}/reset-password', [UserPageController::class, 'resetPassword'])->name('users.reset-password');
+    });
 
     Route::get('requests', [RequestPageController::class, 'index'])->name('requests.index');
     Route::get('requests/create', [RequestPageController::class, 'create'])->name('requests.create');

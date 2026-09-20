@@ -30,6 +30,7 @@ use App\Models\User;
 use App\Queries\ActivityFeed;
 use App\Queries\Discussion;
 use App\Queries\RequestListQuery;
+use App\Queries\WorkloadBoard;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -83,12 +84,13 @@ class RequestPageController extends Controller
                 ? Department::query()->where('is_active', true)->orderBy('name')->get(['id', 'name'])
                 : [],
             'ownDepartment' => $request->user()->department?->name,
+            'maxUploadMb' => (int) round(config('athar.attachments.max_kb') / 1024),
         ]);
     }
 
     public function store(StoreServiceRequest $request, CreateRequest $create): RedirectResponse
     {
-        $created = $create->handle($request->user(), $request->validated());
+        $created = $create->handle($request->user(), $request->validated(), $request->file('files', []));
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('requests.flash.created', ['number' => $created->request_number])]);
 
@@ -175,8 +177,18 @@ class RequestPageController extends Controller
             ->whereHas('roles', fn ($q) => $q->whereIn('code', [RoleCode::Staff->value, RoleCode::TeamLead->value]))
             ->with('teams:id')
             ->orderBy('name')
-            ->get()
-            ->map(fn (User $u) => ['id' => $u->id, 'name' => $u->name, 'team_ids' => $u->teams->pluck('id')->values()]);
+            ->get();
+
+        // Each person's open-task count and colour. Information for the assigner; it never blocks an assignment.
+        $load = app(WorkloadBoard::class)->loadFor($users->pluck('id')->all());
+
+        $users = $users->map(fn (User $u) => [
+            'id' => $u->id,
+            'name' => $u->name,
+            'team_ids' => $u->teams->pluck('id')->values(),
+            'open' => $load[$u->id]['open'],
+            'level' => $load[$u->id]['level'],
+        ]);
 
         return [
             'teams' => Team::query()->where('is_active', true)->orderBy('name')->get(['id', 'name']),

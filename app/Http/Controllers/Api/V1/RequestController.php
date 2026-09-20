@@ -42,7 +42,7 @@ class RequestController extends Controller
 
     public function store(StoreServiceRequest $request, CreateRequest $create): JsonResponse
     {
-        $created = $create->handle($request->user(), $request->validated());
+        $created = $create->handle($request->user(), $request->validated(), $request->file('files', []));
 
         return RequestDetailResource::make($this->hydrate($created))
             ->response()

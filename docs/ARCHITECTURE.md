@@ -219,6 +219,29 @@ sama dengan halaman daftar, jadi kartu dan daftar tujuan tidak mungkin berbeda (
 `GET /requests/{ref}/attachments/{id}/download`, `GET /requests/{ref}/reviews`, `POST /requests/{ref}/review`,
 `GET /notifications`, `POST /notifications/{id}/read`, `POST /notifications/read-all`, `GET /dashboards/{requester|staff|management}`.
 
+## 8c. Pengguna, prioritas berwarna, upload saat buka tiket, beban kerja
+
+**Pengguna (`Actions/Admin/*`, `UserPolicy`).** `CreateUser`, `UpdateUser`, `ResetUserPassword`; hanya ADMIN aktif (Policy dicek di dalam
+Action, sama untuk web `/admin/users` dan API `/api/v1/admin/users`). `UserRules` menjaga koherensi: minimal satu peran; MANAGEMENT
+berdiri sendiri (peran khusus-lihat); STAFF/TEAM_LEAD wajib punya tim aktif; tim harus ada dan aktif. Pagar pengaman: tidak bisa
+menonaktifkan diri sendiri, dan sistem tidak pernah tanpa admin aktif. Menonaktifkan/reset password langsung mencabut **token API dan
+sesi web** orang itu. Password otomatis (14 karakter) dikembalikan **sekali** dan tidak ditulis ke audit. Tabel `audit_logs`
+(`actor`, `subject`, `action`, `old_values`, `new_values` JSON) append-only: penjaga model + trigger MySQL (`AuditGuards` kini menjaga
+`activity_logs` **dan** `audit_logs`; `athar:audit-guards` memeriksa keduanya).
+
+**Prioritas berwarna.** Murni tampilan: LOW hijau, NORMAL kuning, HIGH oranye, CRITICAL merah (`lib/urgency.ts`, `PriorityStripe`,
+`PriorityBanner`). Prioritas tetap dipilih manusia (spec §6); tidak ada perhitungan otomatis, dan warna tidak pernah menjadi satu-satunya
+penanda (label tertulis ada).
+
+**Upload saat membuka tiket.** `POST /requests` menerima `files[]` (maks. 5). `CreateRequest` memeriksa semua berkas dengan `FileGuard`
+**sebelum** menyimpan apa pun, lalu membuat request + lampiran (jenis `BRIEF`) dalam satu transaksi. Jika gagal di tengah, baris di-rollback
+dan berkas yang sudah tertulis dihapus; nomor request tidak terbuang.
+
+**Beban kerja (`WorkloadBoard`).** Terbuka untuk semua pengguna login, tetapi payload hanya berisi **jumlah dan nama kategori**, tidak pernah
+judul atau nomor request, sehingga transparansi kapasitas tidak membocorkan isi permintaan orang lain (test memastikannya). Tingkat warna
+dari `config('athar.workload')`: hijau < 3, kuning 3-4, oranye 5-6, **merah ≥ 7 (lebih dari 6)**. Warna hanya informasi: `AssignRequest` tidak
+pernah menolak penugasan karena beban. Panel penugasan menampilkan titik warna + jumlah tugas tiap orang. Endpoint: `GET /api/v1/workload`.
+
 ## 9. Urutan berikutnya
 
 1. Lampiran (penyimpanan privat, validasi tipe/ukuran, berversi)

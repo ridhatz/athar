@@ -19,6 +19,9 @@ class StoreServiceRequest extends FormRequest
             'category_id' => ['required', 'integer', Rule::exists('request_categories', 'id')->where('is_active', true)],
             'deadline' => ['required', 'date', 'after:now'],
             'priority' => ['nullable', Rule::enum(RequestPriority::class)],
+            // Optional files at the moment of opening (PDF, documents, images). Each is checked again by FileGuard.
+            'files' => ['nullable', 'array', 'max:5'],
+            'files.*' => ['file', 'max:'.config('athar.attachments.max_kb')],
             'department_id' => ['nullable', 'integer', Rule::exists('departments', 'id')->where('is_active', true)],
         ];
     }

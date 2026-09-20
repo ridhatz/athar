@@ -2,6 +2,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import { Plus, Search, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { PriorityBadge, StatusBadge } from '@/components/athar/status-badge';
+import { PriorityStripe } from '@/components/athar/urgency-bar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -301,7 +302,10 @@ export default function RequestsIndex({
                         <TableBody>
                             {requests.data.map((item) => (
                                 <TableRow key={item.id}>
-                                    <TableCell className="font-mono text-xs whitespace-nowrap">
+                                    <TableCell className="relative pl-5 font-mono text-xs whitespace-nowrap">
+                                        <PriorityStripe
+                                            priority={item.priority}
+                                        />
                                         <Link
                                             href={show({
                                                 serviceRequest:

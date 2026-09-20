@@ -18,6 +18,22 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Workload colours
+    |--------------------------------------------------------------------------
+    |
+    | How many open tasks a person holds decides their colour on the workload board:
+    | green below "yellow_from", then yellow, orange, and red from "red_from" (more than 6).
+    | The colour is information only. Nobody is ever blocked from being given more work.
+    |
+    */
+
+    'workload' => [
+        'yellow_from' => (int) env('ATHAR_WORKLOAD_YELLOW_FROM', 3),
+        'orange_from' => (int) env('ATHAR_WORKLOAD_ORANGE_FROM', 5),
+        'red_from' => (int) env('ATHAR_WORKLOAD_RED_FROM', 7),
+    ],
+    /*
+    |--------------------------------------------------------------------------
     | Notifications
     |--------------------------------------------------------------------------
     |

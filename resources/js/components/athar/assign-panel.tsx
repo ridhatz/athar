@@ -11,6 +11,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { LevelDot } from '@/components/athar/urgency-bar';
 import { Spinner } from '@/components/ui/spinner';
 import { useT } from '@/hooks/use-t';
 import { assign } from '@/routes/requests';
@@ -130,7 +131,15 @@ export function AssignPanel({
                                 key={person.id}
                                 value={String(person.id)}
                             >
-                                {person.name}
+                                <span className="flex items-center gap-2">
+                                    <LevelDot level={person.level} />
+                                    {person.name}
+                                    <span className="text-muted-foreground text-xs">
+                                        {t('assign.load', { n: person.open })}
+                                        {person.level === 'red' &&
+                                            ` · ${t('assign.load_red')}`}
+                                    </span>
+                                </span>
                             </SelectItem>
                         ))}
                     </SelectContent>

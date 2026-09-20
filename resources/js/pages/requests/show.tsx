@@ -8,6 +8,7 @@ import { FilesCard } from '@/components/athar/files-card';
 import { ReviewCard } from '@/components/athar/review-card';
 import { StatusActions } from '@/components/athar/status-actions';
 import { PriorityBadge, StatusBadge } from '@/components/athar/status-badge';
+import { PriorityBanner } from '@/components/athar/urgency-bar';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -109,6 +110,9 @@ export default function ShowRequest({
                             <h1 className="text-2xl font-semibold tracking-tight break-words">
                                 {request.title}
                             </h1>
+                            <div className="mt-3 max-w-xs">
+                                <PriorityBanner priority={request.priority} />
+                            </div>
                         </div>
 
                         {(request.permissions.edit_details ||
