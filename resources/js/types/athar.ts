@@ -275,3 +275,40 @@ export type Credentials = {
     email: string;
     password: string | null;
 };
+
+/**
+ * Reference data as the administrator sees it. None of these are ever deleted; `is_active` is
+ * the only destructive move, and the server refuses the ones that would break something.
+ */
+export type AdminTeam = {
+    id: number;
+    name: string;
+    description: string | null;
+    is_active: boolean;
+    members_count: number;
+    /** Workers left with no active team if this one closed. Empty means closing is allowed. */
+    stranded_members?: string[];
+    created_at: string | null;
+};
+
+export type AdminCategory = {
+    id: number;
+    /** Fixed when the category is created; the form shows it but never sends it back. */
+    slug: string;
+    name_id: string;
+    name_en: string;
+    guidance_id: string | null;
+    guidance_en: string | null;
+    sort_order: number;
+    is_active: boolean;
+    requests_count: number;
+    created_at: string | null;
+};
+
+export type AdminDepartment = {
+    id: number;
+    name: string;
+    is_active: boolean;
+    users_count: number;
+    created_at: string | null;
+};

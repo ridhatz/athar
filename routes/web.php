@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\Admin\CategoryPageController;
+use App\Http\Controllers\Admin\DepartmentPageController;
+use App\Http\Controllers\Admin\TeamPageController;
 use App\Http\Controllers\Admin\UserPageController;
 use App\Http\Controllers\AttachmentDownloadController;
 use App\Http\Controllers\DashboardController;
@@ -24,12 +27,25 @@ Route::middleware(['auth', 'active'])->group(function () {
 
     Route::get('workload', [WorkloadController::class, 'index'])->name('workload.index');
 
-    // People management (ADMIN only, enforced by UserPolicy inside the Actions).
+    // People and reference data (ADMIN only, enforced by the policies inside the Actions).
+    // Nothing here deletes: rows are switched off with `is_active` so history keeps its referents.
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('users', [UserPageController::class, 'index'])->name('users.index');
         Route::post('users', [UserPageController::class, 'store'])->name('users.store');
         Route::patch('users/{user}', [UserPageController::class, 'update'])->name('users.update');
         Route::post('users/{user}/reset-password', [UserPageController::class, 'resetPassword'])->name('users.reset-password');
+
+        Route::get('teams', [TeamPageController::class, 'index'])->name('teams.index');
+        Route::post('teams', [TeamPageController::class, 'store'])->name('teams.store');
+        Route::patch('teams/{team}', [TeamPageController::class, 'update'])->name('teams.update');
+
+        Route::get('categories', [CategoryPageController::class, 'index'])->name('categories.index');
+        Route::post('categories', [CategoryPageController::class, 'store'])->name('categories.store');
+        Route::patch('categories/{category}', [CategoryPageController::class, 'update'])->name('categories.update');
+
+        Route::get('departments', [DepartmentPageController::class, 'index'])->name('departments.index');
+        Route::post('departments', [DepartmentPageController::class, 'store'])->name('departments.store');
+        Route::patch('departments/{department}', [DepartmentPageController::class, 'update'])->name('departments.update');
     });
 
     Route::get('requests', [RequestPageController::class, 'index'])->name('requests.index');

@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Http\Resources\NotificationResource;
 use App\Models\ServiceRequest;
+use App\Models\Team;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -53,6 +54,9 @@ class HandleInertiaRequests extends Middleware
             'can' => [
                 'create_request' => $user !== null && Gate::forUser($user)->allows('create', ServiceRequest::class),
                 'manage_users' => $user !== null && Gate::forUser($user)->allows('viewAny', User::class),
+                // Teams, categories and departments share one stance (ADMIN only), so one flag
+                // stands for all three reference screens.
+                'manage_reference' => $user !== null && Gate::forUser($user)->allows('viewAny', Team::class),
             ],
             // The bell: unread count and the latest few. Cheap enough to send with every page.
             'notifications' => $user ? [

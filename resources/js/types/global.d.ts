@@ -12,7 +12,11 @@ declare module '@inertiajs/core' {
         sharedPageProps: {
             name: string;
             auth: Auth;
-            can: { create_request: boolean; manage_users: boolean };
+            can: {
+                create_request: boolean;
+                manage_users: boolean;
+                manage_reference: boolean;
+            };
             notifications: {
                 unread: number;
                 recent: NotificationEntry[];

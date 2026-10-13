@@ -18,6 +18,16 @@ class Team extends Model
 {
     use HasFactory;
 
+    /**
+     * Workers who would be left without any active team if this one were switched off.
+     *
+     * Filled in by the admin screen (see ReferenceRules); a declared property rather than a
+     * dynamic one so it is typed and Eloquent never mistakes it for a column.
+     *
+     * @var array<int, string>|null
+     */
+    public ?array $strandedMembers = null;
+
     protected function casts(): array
     {
         return ['is_active' => 'boolean'];
