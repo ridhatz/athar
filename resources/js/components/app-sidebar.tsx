@@ -1,10 +1,12 @@
 import { Link, usePage } from '@inertiajs/react';
 import {
     Building2,
+    ChartPie,
     FolderTree,
     LayoutGrid,
     ListChecks,
     PlusCircle,
+    Target,
     UserCog,
     Users,
     UsersRound,
@@ -27,6 +29,7 @@ import { index as categories } from '@/routes/admin/categories';
 import { index as departments } from '@/routes/admin/departments';
 import { index as teams } from '@/routes/admin/teams';
 import { index as people } from '@/routes/admin/users';
+import { analysis as kpiAnalysis, index as kpi } from '@/routes/kpi';
 import { index as workload } from '@/routes/workload';
 import { create, index } from '@/routes/requests';
 import type { NavItem } from '@/types';
@@ -39,6 +42,9 @@ export function AppSidebar() {
         { title: t('nav.dashboard'), href: dashboard(), icon: LayoutGrid },
         { title: t('nav.requests'), href: index(), icon: ListChecks },
         { title: t('nav.workload'), href: workload(), icon: Users },
+        // Everyone has a KPI sheet; the list narrows itself to what you may see.
+        { title: t('nav.kpi'), href: kpi(), icon: Target },
+        { title: t('nav.kpi_analysis'), href: kpiAnalysis(), icon: ChartPie },
         // Only administrators are offered the People screen (the server enforces it regardless).
         ...(can.manage_users
             ? [{ title: t('nav.people'), href: people(), icon: UserCog }]

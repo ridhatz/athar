@@ -6,6 +6,8 @@ use App\Http\Controllers\Admin\TeamPageController;
 use App\Http\Controllers\Admin\UserPageController;
 use App\Http\Controllers\AttachmentDownloadController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Kpi\KpiAnalysisController;
+use App\Http\Controllers\Kpi\KpiPageController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\RequestDiscussionController;
@@ -26,6 +28,17 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::post('notifications/{id}/open', [NotificationController::class, 'open'])->name('notifications.open');
 
     Route::get('workload', [WorkloadController::class, 'index'])->name('workload.index');
+
+    // KPI. Everyone has a sheet; who sees whose, and who may sign one off, is KpiPolicy's call.
+    Route::prefix('kpi')->name('kpi.')->group(function () {
+        Route::get('/', [KpiPageController::class, 'index'])->name('index');
+        Route::get('analysis', [KpiAnalysisController::class, 'index'])->name('analysis');
+        Route::post('/', [KpiPageController::class, 'store'])->name('store');
+        Route::post('generate', [KpiPageController::class, 'generate'])->name('generate');
+        Route::patch('{kpi}/achievements', [KpiPageController::class, 'fill'])->name('fill');
+        Route::post('{kpi}/submit', [KpiPageController::class, 'submit'])->name('submit');
+        Route::post('{kpi}/review', [KpiPageController::class, 'review'])->name('review');
+    });
 
     // People and reference data (ADMIN only, enforced by the policies inside the Actions).
     // Nothing here deletes: rows are switched off with `is_active` so history keeps its referents.

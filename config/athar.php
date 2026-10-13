@@ -32,6 +32,22 @@ return [
         'orange_from' => (int) env('ATHAR_WORKLOAD_ORANGE_FROM', 5),
         'red_from' => (int) env('ATHAR_WORKLOAD_RED_FROM', 7),
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | KPI
+    |--------------------------------------------------------------------------
+    |
+    | Scores are deliberately NOT capped at 100: beating a target is worth more than meeting it,
+    | and the sheet should say so. There is a ceiling all the same, because without one a
+    | "lower is better" KPI reported as 0 would divide by zero and score infinity. The ceiling is
+    | the most any single KPI can be worth, as a multiple of its weight.
+    |
+    */
+
+    'kpi' => [
+        'max_ratio' => (float) env('ATHAR_KPI_MAX_RATIO', 2.0),
+    ],
     /*
     |--------------------------------------------------------------------------
     | Notifications

@@ -312,3 +312,56 @@ export type AdminDepartment = {
     users_count: number;
     created_at: string | null;
 };
+
+export type KpiStatusName = 'PENDING' | 'SUBMITTED' | 'REVIEWED' | 'REVISION';
+
+export type KpiDirectionName = 'HIGHER_BETTER' | 'LOWER_BETTER';
+
+export type KpiFrequencyName = 'MONTHLY' | 'QUARTERLY' | 'YEARLY';
+
+/**
+ * One line of a KPI sheet. The raw numbers travel beside the formatted labels: the table shows
+ * "<90%" while the input box edits 90, and the two must not drift apart.
+ */
+export type KpiItem = {
+    id: number;
+    name: string;
+    target_value: number;
+    target_label: string;
+    direction: KpiDirectionName;
+    unit: string | null;
+    weight: number;
+    frequency: KpiFrequencyName;
+    achievement: number | null;
+    achievement_label: string;
+    score: number | null;
+};
+
+export type Kpi = {
+    id: number;
+    user: {
+        id: number;
+        name: string;
+        teams: string[];
+        department: string | null;
+    } | null;
+    period: string;
+    period_start: string;
+    period_end: string;
+    due_date: string | null;
+    status: KpiStatusName;
+    final_score: number | null;
+    /** How much of the sheet has been reported, 0–100. Not a performance figure. */
+    progress: number;
+    review_note: string | null;
+    reviewer: string | null;
+    reviewed_at: string | null;
+    submitted_at: string | null;
+    items: KpiItem[];
+    /** Decided by the server; the UI only shows or hides. */
+    can: { fill?: boolean; review?: boolean; update?: boolean };
+};
+
+export type KpiTrendPoint = { month: number; average: number | null };
+
+export type KpiDistributionSlice = { status: KpiStatusName; total: number };
