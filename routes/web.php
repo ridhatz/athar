@@ -8,6 +8,7 @@ use App\Http\Controllers\AttachmentDownloadController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Kpi\KpiAnalysisController;
 use App\Http\Controllers\Kpi\KpiPageController;
+use App\Http\Controllers\Kpi\KpiTemplatePageController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\RequestDiscussionController;
@@ -33,6 +34,9 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::prefix('kpi')->name('kpi.')->group(function () {
         Route::get('/', [KpiPageController::class, 'index'])->name('index');
         Route::get('analysis', [KpiAnalysisController::class, 'index'])->name('analysis');
+        Route::get('templates', [KpiTemplatePageController::class, 'index'])->name('templates.index');
+        Route::post('templates', [KpiTemplatePageController::class, 'store'])->name('templates.store');
+        Route::patch('templates/{template}', [KpiTemplatePageController::class, 'update'])->name('templates.update');
         Route::post('/', [KpiPageController::class, 'store'])->name('store');
         Route::post('generate', [KpiPageController::class, 'generate'])->name('generate');
         Route::patch('{kpi}/achievements', [KpiPageController::class, 'fill'])->name('fill');

@@ -1,5 +1,5 @@
 import { Head, router } from '@inertiajs/react';
-import { Check, Eye, RotateCcw, Search, Sparkles } from 'lucide-react';
+import { Check, Eye, Plus, RotateCcw, Search, Sparkles } from 'lucide-react';
 import { useState } from 'react';
 import InputError from '@/components/input-error';
 import { Badge } from '@/components/ui/badge';
@@ -32,7 +32,12 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { useT } from '@/hooks/use-t';
 import { cn } from '@/lib/utils';
-import { fill, generate, index, review, submit } from '@/routes/kpi';
+import {
+    emptyLine,
+    KpiLines,
+    type KpiLine,
+} from '@/components/athar/kpi-lines';
+import { fill, generate, index, review, store, submit } from '@/routes/kpi';
 import type { Kpi, KpiStatusName, NamedRef, Paginated } from '@/types/athar';
 
 type Props = {
@@ -354,6 +359,137 @@ function KpiDetailDialog({ kpi, onClose }: { kpi: Kpi; onClose: () => void }) {
 }
 
 /** Opens one month of sheets for everybody from their team's template. */
+/**
+ * Opens one person's sheet by hand, for somebody whose KPIs do not come from a team template.
+ * Targets and weights are the administrator's to set; achievements are not asked for here.
+ */
+function AddKpiDialog({
+    employees,
+    onClose,
+}: {
+    employees: NamedRef[];
+    onClose: () => void;
+}) {
+    const { t } = useT();
+
+    const [employee, setEmployee] = useState('');
+    const [period, setPeriod] = useState(new Date().toISOString().slice(0, 7));
+    const [dueDate, setDueDate] = useState('');
+    const [lines, setLines] = useState<KpiLine[]>([emptyLine()]);
+    const [errors, setErrors] = useState<Record<string, string>>({});
+    const [processing, setProcessing] = useState(false);
+
+    const submitForm = (event: React.FormEvent) => {
+        event.preventDefault();
+        setProcessing(true);
+
+        router.post(
+            store().url,
+            {
+                user_id: employee === '' ? null : Number(employee),
+                period,
+                due_date: dueDate === '' ? null : dueDate,
+                items: lines.map((line) => ({
+                    name: line.name,
+                    target_value: Number(line.target_value),
+                    direction: line.direction,
+                    unit: line.unit === '' ? null : line.unit,
+                    weight: Number(line.weight),
+                    frequency: line.frequency,
+                })),
+            },
+            {
+                preserveScroll: true,
+                onSuccess: () => onClose(),
+                onError: setErrors,
+                onFinish: () => setProcessing(false),
+            },
+        );
+    };
+
+    return (
+        <Dialog open onOpenChange={(open) => !open && onClose()}>
+            <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
+                <form onSubmit={submitForm} className="space-y-4">
+                    <DialogHeader>
+                        <DialogTitle>{t('kpi.add')}</DialogTitle>
+                    </DialogHeader>
+
+                    <div className="grid gap-3 sm:grid-cols-3">
+                        <div className="space-y-2">
+                            <Label htmlFor="kpi-employee">
+                                {t('kpi.form.employee')}
+                            </Label>
+                            <Select
+                                value={employee}
+                                onValueChange={setEmployee}
+                            >
+                                <SelectTrigger id="kpi-employee">
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {employees.map((e) => (
+                                        <SelectItem
+                                            key={e.id}
+                                            value={String(e.id)}
+                                        >
+                                            {e.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            <InputError message={errors.user_id} />
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="kpi-period">
+                                {t('kpi.form.period')}
+                            </Label>
+                            <Input
+                                id="kpi-period"
+                                type="month"
+                                value={period}
+                                onChange={(e) => setPeriod(e.target.value)}
+                                required
+                            />
+                            <InputError message={errors.period} />
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="kpi-due">
+                                {t('kpi.form.due_date')}
+                            </Label>
+                            <Input
+                                id="kpi-due"
+                                type="date"
+                                value={dueDate}
+                                onChange={(e) => setDueDate(e.target.value)}
+                            />
+                            <InputError message={errors.due_date} />
+                        </div>
+                    </div>
+
+                    <KpiLines
+                        lines={lines}
+                        onChange={setLines}
+                        errors={errors}
+                    />
+
+                    <DialogFooter>
+                        <Button type="button" variant="ghost" onClick={onClose}>
+                            {t('common.cancel')}
+                        </Button>
+                        <Button type="submit" disabled={processing}>
+                            {processing && <Spinner />}
+                            {t('common.save')}
+                        </Button>
+                    </DialogFooter>
+                </form>
+            </DialogContent>
+        </Dialog>
+    );
+}
+
 function GenerateDialog({ onClose }: { onClose: () => void }) {
     const { t } = useT();
     const [period, setPeriod] = useState(new Date().toISOString().slice(0, 7));
@@ -419,12 +555,14 @@ export default function KpiIndex({
     statuses,
     periods,
     canCreate,
+    employees,
 }: Props) {
     const { t, locale } = useT();
 
     const [search, setSearch] = useState(filters.q);
     const [open, setOpen] = useState<Kpi | null>(null);
     const [generating, setGenerating] = useState(false);
+    const [adding, setAdding] = useState(false);
 
     const apply = (next: Partial<typeof filters>) => {
         const merged = { ...filters, ...next };
@@ -450,13 +588,19 @@ export default function KpiIndex({
                         </p>
                     </div>
                     {canCreate && (
-                        <Button
-                            variant="outline"
-                            onClick={() => setGenerating(true)}
-                        >
-                            <Sparkles />
-                            {t('kpi.generate')}
-                        </Button>
+                        <div className="flex flex-wrap gap-2">
+                            <Button
+                                variant="outline"
+                                onClick={() => setGenerating(true)}
+                            >
+                                <Sparkles />
+                                {t('kpi.generate')}
+                            </Button>
+                            <Button onClick={() => setAdding(true)}>
+                                <Plus />
+                                {t('kpi.add')}
+                            </Button>
+                        </div>
                     )}
                 </div>
 
@@ -655,6 +799,13 @@ export default function KpiIndex({
 
             {generating && (
                 <GenerateDialog onClose={() => setGenerating(false)} />
+            )}
+
+            {adding && (
+                <AddKpiDialog
+                    employees={employees}
+                    onClose={() => setAdding(false)}
+                />
             )}
         </>
     );

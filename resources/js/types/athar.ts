@@ -362,6 +362,26 @@ export type Kpi = {
     can: { fill?: boolean; review?: boolean; update?: boolean };
 };
 
+/**
+ * A team's blueprint. Generating a month copies these values onto each sheet, so a template is
+ * never the record of anyone's score — editing one leaves running sheets alone.
+ */
+export type KpiTemplate = {
+    id: number;
+    name: string;
+    team: NamedRef | null;
+    is_active: boolean;
+    total_weight: number;
+    items: {
+        name: string;
+        target_value: number;
+        direction: KpiDirectionName;
+        unit: string | null;
+        weight: number;
+        frequency: KpiFrequencyName;
+    }[];
+};
+
 export type KpiTrendPoint = { month: number; average: number | null };
 
 export type KpiDistributionSlice = { status: KpiStatusName; total: number };

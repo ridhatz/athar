@@ -2,6 +2,7 @@ import { Link, usePage } from '@inertiajs/react';
 import {
     Building2,
     ChartPie,
+    ClipboardList,
     FolderTree,
     LayoutGrid,
     ListChecks,
@@ -30,6 +31,7 @@ import { index as departments } from '@/routes/admin/departments';
 import { index as teams } from '@/routes/admin/teams';
 import { index as people } from '@/routes/admin/users';
 import { analysis as kpiAnalysis, index as kpi } from '@/routes/kpi';
+import { index as kpiTemplates } from '@/routes/kpi/templates';
 import { index as workload } from '@/routes/workload';
 import { create, index } from '@/routes/requests';
 import type { NavItem } from '@/types';
@@ -45,6 +47,16 @@ export function AppSidebar() {
         // Everyone has a KPI sheet; the list narrows itself to what you may see.
         { title: t('nav.kpi'), href: kpi(), icon: Target },
         { title: t('nav.kpi_analysis'), href: kpiAnalysis(), icon: ChartPie },
+        // Blueprints are reference data, so only an administrator is offered them.
+        ...(can.manage_reference
+            ? [
+                  {
+                      title: t('nav.kpi_templates'),
+                      href: kpiTemplates(),
+                      icon: ClipboardList,
+                  },
+              ]
+            : []),
         // Only administrators are offered the People screen (the server enforces it regardless).
         ...(can.manage_users
             ? [{ title: t('nav.people'), href: people(), icon: UserCog }]
