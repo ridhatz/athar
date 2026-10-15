@@ -14,11 +14,9 @@ import {
 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavMain } from '@/components/nav-main';
-import { NavUser } from '@/components/nav-user';
 import {
     Sidebar,
     SidebarContent,
-    SidebarFooter,
     SidebarHeader,
     SidebarMenu,
     SidebarMenuButton,
@@ -91,6 +89,10 @@ export function AppSidebar() {
 
     return (
         <Sidebar collapsible="icon" variant="inset">
+            {/* The logo lives directly on the panel's own blue, same as the nav below it — one
+                continuous surface instead of a white card sitting inside a blue one. The signed-in
+                user used to live in a footer here; it now lives in the top bar (desktop) or the
+                bottom bar (mobile) — see AppSidebarHeader / MobileBottomBar. */}
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
@@ -106,10 +108,6 @@ export function AppSidebar() {
             <SidebarContent>
                 <NavMain items={mainNavItems} />
             </SidebarContent>
-
-            <SidebarFooter>
-                <NavUser />
-            </SidebarFooter>
         </Sidebar>
     );
 }

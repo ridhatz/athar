@@ -59,6 +59,14 @@
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-ring: var(--sidebar-ring);
+
+    /* The active nav item and the hover state are deliberately separate variables (not both
+       aliased to --sidebar-accent) so light mode can give them different colors; .dark sets
+       both back to --sidebar-accent, so dark mode is visually untouched. */
+    --color-sidebar-nav-active: var(--sidebar-nav-active);
+    --color-sidebar-nav-active-foreground: var(--sidebar-nav-active-foreground);
+    --color-sidebar-nav-hover: var(--sidebar-nav-hover);
+    --color-sidebar-nav-hover-foreground: var(--sidebar-nav-hover-foreground);
 }
 
 :root {
@@ -87,14 +95,26 @@
     --chart-4: oklch(0.828 0.189 84.429);
     --chart-5: oklch(0.769 0.188 70.08);
     --radius: 0.625rem;
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
+    /* The whole panel (header, menu list, footer) reads this directly via bg-sidebar
+       text-sidebar-foreground on the Sidebar container, so these two alone recolor the entire
+       nav, not just the menu rows. */
+    --sidebar: #004aad;
+    --sidebar-foreground: #e6edf7;
+    /* The logo mark's badge: light-on-blue, same pairing as the active/hover nav pill, so it
+       reads as part of one deliberate two-color scheme rather than a leftover dark square. */
+    --sidebar-primary: #e6edf7;
+    --sidebar-primary-foreground: #004aad;
     --sidebar-accent: oklch(0.97 0 0);
     --sidebar-accent-foreground: oklch(0.205 0 0);
     --sidebar-border: oklch(0.922 0 0);
     --sidebar-ring: oklch(0.87 0 0);
+    /* Resting rows show the dark-blue panel through (foreground e6edf7 on transparent); hover
+       and the current page both flip to a light e6edf7 pill with dark-blue text, so "where am I"
+       stays legible against the blue background. */
+    --sidebar-nav-active: #e6edf7;
+    --sidebar-nav-active-foreground: #004aad;
+    --sidebar-nav-hover: #e6edf7;
+    --sidebar-nav-hover-foreground: #004aad;
 }
 
 .dark {
@@ -130,6 +150,12 @@
     --sidebar-accent-foreground: oklch(0.985 0 0);
     --sidebar-border: oklch(0.269 0 0);
     --sidebar-ring: oklch(0.439 0 0);
+    /* The 004aad/e6edf7 nav colors are a light-mode-only request; dark mode keeps whatever
+       --sidebar-accent already was, so it reads as "turned off" here. */
+    --sidebar-nav-active: var(--sidebar-accent);
+    --sidebar-nav-active-foreground: var(--sidebar-accent-foreground);
+    --sidebar-nav-hover: var(--sidebar-accent);
+    --sidebar-nav-hover-foreground: var(--sidebar-accent-foreground);
 }
 
 @layer base {

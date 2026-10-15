@@ -16,8 +16,11 @@ export default function AppLogo() {
                 <span className="truncate leading-tight font-semibold">
                     {name}
                 </span>
-                <span className="text-muted-foreground truncate text-[11px] leading-tight">
-                    {t('app.tagline')}
+                {/* A different line than the login page's app.tagline: this one names what the
+                    product is ("Management Operational System"), not the brand motto, so this
+                    key is sidebar-only and app.tagline elsewhere is untouched. */}
+                <span className="text-sidebar-foreground/70 truncate text-[11px] leading-tight">
+                    {t('app.sidebar_subtitle')}
                 </span>
             </div>
         </>

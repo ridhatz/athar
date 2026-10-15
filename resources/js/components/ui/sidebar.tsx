@@ -136,7 +136,12 @@ function SidebarProvider({
           } as React.CSSProperties
         }
         className={cn(
-          "group/sidebar-wrapper has-data-[variant=inset]:bg-sidebar flex min-h-svh w-full",
+          // This is the page backdrop showing through the gap around the floating "inset"
+          // cards — not the sidebar's own color. It used to alias bg-sidebar, harmlessly, back
+          // when the sidebar was a near-white neutral; now that --sidebar is a bold blue brand
+          // color, reusing it here painted that gap blue too, which read as a stray sliver
+          // between the header card and the content card rather than a deliberate frame.
+          "group/sidebar-wrapper has-data-[variant=inset]:bg-background flex min-h-svh w-full",
           className
         )}
         {...props}
@@ -467,13 +472,18 @@ function SidebarMenuItem({ className, ...props }: React.ComponentProps<"li">) {
 }
 
 const sidebarMenuButtonVariants = cva(
-  "peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-hidden ring-sidebar-ring transition-[width,height,padding] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-data-[sidebar=menu-action]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:p-2! [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
+  // Active (data-[active=true], the current page) and hover are deliberately different color
+  // variables (--sidebar-nav-active vs --sidebar-nav-hover) rather than both reusing
+  // --sidebar-accent: light mode gives them their own blue (#004aad / #e6edf7), while .dark sets
+  // both variables back to --sidebar-accent so dark mode is unchanged.
+  "peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-hidden ring-sidebar-ring transition-[width,height,padding] hover:bg-sidebar-nav-hover hover:text-sidebar-nav-hover-foreground focus-visible:ring-2 active:bg-sidebar-nav-hover active:text-sidebar-nav-hover-foreground disabled:pointer-events-none disabled:opacity-50 group-has-data-[sidebar=menu-action]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-nav-active data-[active=true]:font-medium data-[active=true]:text-sidebar-nav-active-foreground data-[state=open]:hover:bg-sidebar-nav-hover data-[state=open]:hover:text-sidebar-nav-hover-foreground group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:p-2! [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
   {
     variants: {
       variant: {
-        default: "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+        default:
+          "hover:bg-sidebar-nav-hover hover:text-sidebar-nav-hover-foreground",
         outline:
-          "bg-background shadow-[0_0_0_1px_hsl(var(--sidebar-border))] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:shadow-[0_0_0_1px_hsl(var(--sidebar-accent))]",
+          "bg-background shadow-[0_0_0_1px_hsl(var(--sidebar-border))] hover:bg-sidebar-nav-hover hover:text-sidebar-nav-hover-foreground hover:shadow-[0_0_0_1px_hsl(var(--sidebar-accent))]",
       },
       size: {
         default: "h-8 text-sm",

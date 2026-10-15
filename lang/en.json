@@ -40,6 +40,7 @@
     "errors.last_admin": "There must always be at least one active administrator.",
 
     "app.tagline": "From amanah to action.",
+    "app.sidebar_subtitle": "Management Operational System",
     "nav.workspace": "Workspace",
     "nav.requests": "Requests",
     "nav.new_request": "New request",

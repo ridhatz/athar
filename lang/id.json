@@ -40,6 +40,7 @@
     "errors.last_admin": "Harus selalu ada minimal satu administrator aktif.",
 
     "app.tagline": "Dari amanah menjadi aksi.",
+    "app.sidebar_subtitle": "Sistem Manajemen Operasional",
     "nav.workspace": "Ruang Kerja",
     "nav.requests": "Permintaan",
     "nav.new_request": "Buat permintaan",
