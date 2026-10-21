@@ -1,6 +1,7 @@
 import { Head, router } from '@inertiajs/react';
 import { CheckCircle2, RotateCcw } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { DiscGuide } from '@/components/athar/disc-guide';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
@@ -462,11 +463,10 @@ export default function AssessmentIndex({
                 )}
 
                 {canViewAll && all && stats && (
-                    <>
-                        <div className="border-t pt-6">
-                            <AdminRoster all={all} stats={stats} />
-                        </div>
-                    </>
+                    <div className="space-y-4 border-t pt-6">
+                        <DiscGuide />
+                        <AdminRoster all={all} stats={stats} />
+                    </div>
                 )}
             </div>
         </>
