@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\CategoryPageController;
 use App\Http\Controllers\Admin\DepartmentPageController;
 use App\Http\Controllers\Admin\TeamPageController;
 use App\Http\Controllers\Admin\UserPageController;
+use App\Http\Controllers\Assessment\AssessmentController;
 use App\Http\Controllers\AttachmentDownloadController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Kpi\KpiAnalysisController;
@@ -29,6 +30,13 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::post('notifications/{id}/open', [NotificationController::class, 'open'])->name('notifications.open');
 
     Route::get('workload', [WorkloadController::class, 'index'])->name('workload.index');
+
+    // Communication Behavior Assessment. Anyone with an account may take their own; an
+    // administrator also sees everyone's — AssessmentPolicy's call, same shape as KPI below.
+    Route::prefix('assessment')->name('assessment.')->group(function () {
+        Route::get('/', [AssessmentController::class, 'index'])->name('index');
+        Route::post('/', [AssessmentController::class, 'store'])->name('store');
+    });
 
     // KPI. Everyone has a sheet; who sees whose, and who may sign one off, is KpiPolicy's call.
     Route::prefix('kpi')->name('kpi.')->group(function () {

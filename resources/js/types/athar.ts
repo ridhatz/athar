@@ -385,3 +385,23 @@ export type KpiTemplate = {
 export type KpiTrendPoint = { month: number; average: number | null };
 
 export type KpiDistributionSlice = { status: KpiStatusName; total: number };
+
+export type AssessmentRecommendationName = 'SALES' | 'MARKETING' | 'HYBRID';
+
+/** Column position is the dimension — 0=D, 1=I, 2=S, 3=C — the same on every question. */
+export type AssessmentQuestion = [string, string, string, string];
+
+export type AssessmentAnswer = { most: number | null; least: number | null };
+
+export type AssessmentScores = { D: number; I: number; S: number; C: number };
+
+export type AssessmentResult = {
+    id: number;
+    user: NamedRef | null;
+    scores: AssessmentScores;
+    dominant_style: 'D' | 'I' | 'S' | 'C';
+    sales_index: number;
+    marketing_index: number;
+    recommendation: AssessmentRecommendationName;
+    submitted_at: string;
+};

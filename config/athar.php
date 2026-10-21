@@ -48,6 +48,22 @@ return [
     'kpi' => [
         'max_ratio' => (float) env('ATHAR_KPI_MAX_RATIO', 2.0),
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Communication Behavior Assessment
+    |--------------------------------------------------------------------------
+    |
+    | How far apart the Sales-fit and Marketing-fit indexes (see AssessmentScoring) must be
+    | before the result calls one or the other rather than "Hybrid". A small gap is noise, not a
+    | real lean — raise this to call Hybrid more often, lower it to call Sales/Marketing more
+    | readily.
+    |
+    */
+
+    'assessment' => [
+        'role_fit_margin' => (int) env('ATHAR_ASSESSMENT_MARGIN', 4),
+    ],
     /*
     |--------------------------------------------------------------------------
     | Notifications

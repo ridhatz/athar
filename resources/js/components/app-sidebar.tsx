@@ -2,6 +2,7 @@ import { Link, usePage } from '@inertiajs/react';
 import {
     Building2,
     ChartPie,
+    ClipboardCheck,
     ClipboardList,
     FolderTree,
     LayoutGrid,
@@ -24,6 +25,7 @@ import {
 } from '@/components/ui/sidebar';
 import { useT } from '@/hooks/use-t';
 import { dashboard } from '@/routes';
+import { index as assessment } from '@/routes/assessment';
 import { index as categories } from '@/routes/admin/categories';
 import { index as departments } from '@/routes/admin/departments';
 import { index as teams } from '@/routes/admin/teams';
@@ -42,6 +44,12 @@ export function AppSidebar() {
         { title: t('nav.dashboard'), href: dashboard(), icon: LayoutGrid },
         { title: t('nav.requests'), href: index(), icon: ListChecks },
         { title: t('nav.workload'), href: workload(), icon: Users },
+        // Everyone with an account may take it; an admin additionally sees everyone's result.
+        {
+            title: t('nav.assessment'),
+            href: assessment(),
+            icon: ClipboardCheck,
+        },
         // Everyone has a KPI sheet; the list narrows itself to what you may see.
         { title: t('nav.kpi'), href: kpi(), icon: Target },
         { title: t('nav.kpi_analysis'), href: kpiAnalysis(), icon: ChartPie },
